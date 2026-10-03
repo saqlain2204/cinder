@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000;
+      --panel: #0a0a0a;
+      --ink: #ededed;
+      --muted: #a1a1a1;
+      --faint: #737373;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.14);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Geist, Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      letter-spacing: -0.011em;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: inherit; }
+    a:hover { color: #fff; }
+    main { width: min(760px, calc(100% - 40px)); margin: 0 auto; padding-bottom: 96px; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { font-weight: 600; letter-spacing: -0.03em; text-decoration: none; }
+    nav { display: flex; gap: 20px; color: var(--muted); font-size: 14px; }
+    nav a { text-decoration: none; }
+    h1 {
+      margin: 0 0 16px;
+      font-size: 52px;
+      font-weight: 600;
+      letter-spacing: -0.045em;
+      line-height: 1.02;
+    }
+    .lead {
+      margin: 0 0 36px;
+      max-width: 38em;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.55;
+    }
+    .enter { animation: enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .d1 { animation-delay: 0.05s; }
+    .d2 { animation-delay: 0.1s; }
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    .stage {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+    }
+    .tasks { display: flex; gap: 8px; margin-bottom: 14px; }
+    button {
+      font-family: Geist, Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    button.active, button.primary { background: #fff; color: #000; border-color: #fff; }
+    button:disabled { opacity: 0.4; cursor: default; }
+    .play {
+      display: grid;
+      grid-template-columns: minmax(180px, 280px) 1fr;
+      gap: 22px;
+      align-items: center;
+    }
+    .frame {
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 180px;
+    }
+    img { display: block; width: 100%; height: auto; }
+    .prompt {
+      margin: 0 0 14px;
+      white-space: pre-wrap;
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.35;
+    }
+    form { display: flex; flex-wrap: wrap; gap: 8px; }
+    input {
+      flex: 1 1 120px;
+      min-width: 0;
+      font-family: "Geist Mono", ui-monospace, monospace;
+      font-size: 14px;
+      color: var(--ink);
+      background: #000;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    input:focus { outline: 1px solid rgba(255, 255, 255, 0.35); }
+    .result { min-height: 1.6em; margin: 14px 0 0; color: var(--muted); }
+    .result b { color: #fff; font-weight: 600; }
+    .trace {
+      margin: 8px 0 0;
+      color: var(--faint);
+      font-family: "Geist Mono", ui-monospace, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    article { margin-top: 80px; }
+    article h2 {
+      margin: 0 0 14px;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+    }
+    article h3 {
+      margin: 40px 0 8px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+    article p { margin: 0 0 16px; color: #d4d4d4; font-size: 17px; line-height: 1.7; }
+    article strong { color: var(--ink); font-weight: 600; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 8px 0 20px;
+    }
+    .stat {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+    .stat b {
+      display: block;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    pre, code { font-family: "Geist Mono", ui-monospace, monospace; }
+    code { font-size: 0.9em; }
+    pre {
+      margin: 0 0 16px;
+      padding: 14px 16px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      color: #d4d4d4;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media (max-width: 720px) {
+      h1 { font-size: 38px; }
+      header { height: auto; padding: 16px 0; flex-direction: column; align-items: flex-start; gap: 8px; }
+      .play, .stats { grid-template-columns: 1fr; }
+      .frame { max-width: 320px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .enter { animation: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <a class="brand" href="#top">Cinder</a>
+      <nav>
+        <a href="#play">Play</a>
+        <a href="#essay">Essay</a>
+      </nav>
+    </header>
+    <h1 class="enter" id="top">The tally on the clay</h1>
+    <p class="lead enter d1">A clay tablet from an annealing shed. The batch number is not written in digits. You reply, and the environment scores you.</p>
+    <section class="stage enter d2" id="play" aria-label="Play a tablet">
+      <div class="tasks" role="tablist">
+        <button type="button" class="active" data-task="batch">Batch</button>
+        <button type="button" data-task="pins">Pins</button>
+        <button type="button" data-task="pair">Fork</button>
+      </div>
+      <div class="play">
+        <div class="frame"><img id="tablet" alt="Clay tablet marked in the fork tally"></div>
+        <div>
+          <p class="prompt" id="prompt"></p>
+          <form id="guess">
+            <input id="text" autocomplete="off" placeholder="Your reply" aria-label="Your reply">
+            <button class="primary" type="submit">Score</button>
+            <button type="button" id="model">Model</button>
+            <button type="button" id="next">Next</button>
+          </form>
+          <p class="result" id="result"></p>
+          <p class="trace" id="trace"></p>
+        </div>
+      </div>
+    </section>
+    <article id="essay">
+      <h2>A script used in one shed</h2>
+      <p>The night shift at one glassworks marks annealing batches on clay. The tally is used inside that shed and nowhere else. A notch cut into the top of the tablet is five. A pin in the lower field is one. That sum is the raw tally. A copper line across the middle means the tablet was turned on the fork, and the batch number is nine minus the raw tally. Specks along the sides are ash. They are not pins.</p>
+      <p>Nothing in the picture is a decimal digit. The prompt does not contain the number either. A finished batch episode is one digit, from 0 to 9.</p>
+      <h3>What an environment is</h3>
+      <p>The model does not own the shed. It cannot pick the tablet, and it must not be handed the reading. Another program does that work. It chooses the clay, draws the picture, writes the question, and scores the reply. That program is the environment.</p>
+      <p>An episode is three calls. <code>reset</code> starts it and returns an observation: the picture and the prompt. The action is the reply, one token. <code>step</code> sends that reply back and returns a reward. Then the episode is over. The card above is that loop. Reset, a guess, a score. The reading appears only with the score.</p>
+      <p>The environment is there because the tally is not a sentence the model already knows. At the start the weights are random. A convolution can see pixels, and a row of characters can see the question, but nothing in those weights is a notch or a pin. The only teacher is the number that comes back after the reply.</p>
+      <h3>Three questions, one piece of clay</h3>
+      <p><strong>Batch</strong> is one step. Reply with the batch number, turn line included. An exact digit scores 1. A neighbor scores 0.2. Anything else scores 0. There is one correct digit, so the reward points at it.</p>
+      <pre>Read this annealing tablet.
+Reply with the batch number.</pre>
+      <p><strong>Pins</strong> is the same tablet and a different sentence. Reply with how many pins are in the lower field. Notches and the copper line do not count. The picture can stay still while the words change the answer. That is why the prompt is part of the observation, not a caption glued to the image.</p>
+      <p><strong>Fork</strong> puts two tablets on the annealer’s fork. The lower batch leaves the kiln first. Reply left or right. A walk from one side to the other is not required. The score is 1 when the side is the lower batch, and 0 otherwise. That one is for a person. The policy was trained on a single tablet.</p>
+      <h3>Why the update is a reward</h3>
+      <p>The policy is a small vision-language model. A short convolution reads the tablet. The prompt is summed in as characters. The reply is one token, a digit.</p>
+      <p>Each training step lays out every legal reply for the same tablet. The environment scores them. The update raises the probability of a reply in proportion to the reward it just received. A group of identical scores would teach nothing, because nothing in the group is better. Here the scores differ: one digit is exact, a neighbor is close, and the rest are zero. The weights move toward the higher scores. They never receive the digit as a sentence to copy.</p>
+      <p>Reinforcement learning fits this shed because the label is a score, not a paragraph. Batch has one right digit, so that score is enough to climb. Pins is the same kind of score on a different question. Fork is a comparison. OpenEnv is the same <code>reset</code> and <code>step</code> behind a server, so a trainer can run the episode without holding the clay renderer.</p>
+      <div class="stats">
+        <div class="stat"><b>10.8%</b><span>Batch number before any update, on 400 held-out tablets. The weights do not know the tally yet.</span></div>
+        <div class="stat"><b>88.5%</b><span>Batch number after 400 steps. The same 400 tablets.</span></div>
+        <div class="stat"><b>95.3%</b><span>Pin count after training. It started at 10.3%.</span></div>
+      </div>
+      <p>When the batch number and the pin count are different numbers, the two prompts get different replies 77.3% of the time after training, and 10.5% before. The same picture, two rewards, two answers.</p>
+      <h3>Run it</h3>
+      <pre>pip install -e ".[train]"
+python -m cinder.play</pre>
+      <p>The page at <code>127.0.0.1:8091</code> is the same episode: a tablet, a reply, a reward. The OpenEnv server is the loop for another program.</p>
+      <pre>pip install -e ".[openenv]"
+python -m cinder.server.app --port 8000</pre>
+    </article>
+    <footer>Scored against the fork tally. The reading stays hidden until the reply is in.</footer>
+  </main>
+  <script>
+    const BATCH = "Read this annealing tablet.\nReply with the batch number.";
+    const PINS = "Read this annealing tablet.\nReply with the number of pins.";
+    const PAIR = "Two tablets sit on the fork.\nWhich one leaves the kiln first?\nReply left or right.";
+    const promptEl = document.getElementById("prompt");
+    const tabletEl = document.getElementById("tablet");
+    const textEl = document.getElementById("text");
+    const resultEl = document.getElementById("result");
+    const traceEl = document.getElementById("trace");
+    const modelBtn = document.getElementById("model");
+    let catalog = null;
+    let task = "batch";
+    let current = null;
+    let lines = [];
+
+    function lastNumber(text) {
+      const found = String(text).match(/\d+/g);
+      if (!found) return null;
+      const number = Number(found[found.length - 1]);
+      return number > 9 ? null : number;
+    }
+    function lastSide(text) {
+      const hits = String(text).toLowerCase().match(/left|right/g);
+      return hits ? hits[hits.length - 1] : null;
+    }
+    function score(reply) {
+      const reading = current.reading;
+      if (task === "pair") return lastSide(reply) === reading ? 1 : 0;
+      const guess = lastNumber(reply);
+      if (guess === null) return 0;
+      const gap = Math.abs(guess - Number(reading));
+      if (gap === 0) return 1;
+      if (gap === 1) return 0.2;
+      return 0;
+    }
+    function remember(line) {
+      lines = [...lines, line].slice(-4);
+      traceEl.textContent = lines.join("\n");
+    }
+    function show() {
+      const pool = task === "pair" ? catalog.pairs : catalog.tablets;
+      const item = pool[Math.floor(Math.random() * pool.length)];
+      if (task === "pair") {
+        current = { image: item.image, prompt: PAIR, reading: item.reading, model: null };
+      } else if (task === "pins") {
+        current = { image: item.image, prompt: PINS, reading: item.pins, model: item.pinsModel };
+      } else {
+        current = { image: item.image, prompt: BATCH, reading: item.value, model: item.batchModel };
+      }
+      tabletEl.src = current.image;
+      promptEl.textContent = current.prompt;
+      textEl.value = "";
+      textEl.disabled = false;
+      resultEl.textContent = "";
+      modelBtn.disabled = task === "pair";
+      lines = [];
+      remember("reset()  " + task);
+      textEl.focus();
+    }
+    function finish(reply, reward) {
+      resultEl.innerHTML = "Reward <b>" + reward.toFixed(1) + "</b>. The reading is " + current.reading + ".";
+      remember("step(" + reply + ")");
+      remember("reward " + reward.toFixed(1));
+      textEl.disabled = true;
+    }
+    document.getElementById("guess").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const reply = textEl.value.trim();
+      if (!reply || !current || textEl.disabled) return;
+      finish(reply, score(reply));
+    });
+    modelBtn.addEventListener("click", () => {
+      if (!current || !current.model || textEl.disabled) return;
+      textEl.value = current.model;
+      finish(current.model, score(current.model));
+    });
+    document.getElementById("next").addEventListener("click", show);
+    document.querySelectorAll("[data-task]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-task]").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        task = button.dataset.task;
+        show();
+      });
+    });
+    fetch("catalog.json").then((response) => response.json()).then((body) => {
+      catalog = body;
+      show();
+    });
+  </script>
+</body>
+</html>

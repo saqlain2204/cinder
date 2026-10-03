@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,550;6..72,650&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #16110f;
+      --panel: #221814;
+      --text: #f6efe6;
+      --muted: #b7a89c;
+      --faint: #8c7b70;
+      --line: rgba(255, 220, 196, 0.14);
+      --ember: #e07a45;
+      --good: #d7c4a3;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
+    body {
+      font-family: Newsreader, Georgia, serif;
+      font-size: 18px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    main { width: min(980px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 28px; }
+    h1 { margin: 0; font-size: 42px; font-weight: 550; letter-spacing: -0.03em; line-height: 1; }
+    .lede { margin: 8px 0 0; color: var(--muted); font-size: 17px; max-width: 46ch; }
+    .tasks { display: flex; gap: 8px; flex-wrap: wrap; }
+    button, .ghost {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 13px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    button.active, button.primary { background: var(--text); color: #1a120f; border-color: var(--text); }
+    button:disabled { opacity: 0.45; cursor: default; }
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(260px, 420px) 1fr;
+      gap: 28px;
+      align-items: center;
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    .frame {
+      background: #100c0b;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 220px;
+    }
+    img { display: block; width: 100%; height: auto; }
+    .prompt {
+      margin: 0 0 16px;
+      white-space: pre-wrap;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+    }
+    form { display: flex; gap: 8px; flex-wrap: wrap; }
+    input {
+      flex: 1 1 140px;
+      min-width: 0;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 16px;
+      color: var(--text);
+      background: #100c0b;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    input:focus { outline: 1px solid rgba(224, 122, 69, 0.7); }
+    .result { min-height: 3.2em; margin: 16px 0 0; color: var(--muted); }
+    .result b { color: var(--good); font-weight: 550; }
+    .result.hit b { color: #f0d2b4; }
+    .trace {
+      margin: 14px 0 0;
+      color: var(--faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    article { max-width: 68ch; margin-top: 64px; }
+    article h2 { margin: 0 0 12px; font-size: 32px; font-weight: 550; letter-spacing: -0.03em; }
+    article h3 { margin: 32px 0 8px; font-size: 22px; font-weight: 550; }
+    article p { margin: 0 0 14px; color: #e7ddd3; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 8px 0 18px; }
+    .stat { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    .stat b { display: block; font-size: 28px; font-weight: 550; letter-spacing: -0.04em; }
+    .stat span { display: block; margin-top: 6px; color: var(--muted); font-size: 14px; line-height: 1.4; }
+    code { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; }
+    pre {
+      margin: 0 0 16px;
+      padding: 14px 16px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    @media (max-width: 800px) {
+      h1 { font-size: 34px; }
+      header, .stage, .stats { display: block; }
+      .tasks { margin-top: 16px; }
+      .stage > * + * { margin-top: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Cinder</h1>
+        <p class="lede">A clay tablet from an annealing shed. The batch number is not written in digits.</p>
+      </div>
+      <div class="tasks" role="tablist">
+        <button type="button" class="active" data-task="batch">Batch</button>
+        <button type="button" data-task="pins">Pins</button>
+        <button type="button" data-task="pair">Fork</button>
+      </div>
+    </header>
+    <section class="stage">
+      <div class="frame"><img id="tablet" alt="Clay tablet marked in the fork tally"></div>
+      <div>
+        <p class="prompt" id="prompt"></p>
+        <form id="guess">
+          <input id="text" autocomplete="off" placeholder="Your reply" aria-label="Your reply">
+          <button class="primary" type="submit">Score</button>
+          <button type="button" id="model">Model</button>
+          <button type="button" id="next" disabled>Next</button>
+        </form>
+        <p class="result" id="result"></p>
+        <p class="trace" id="trace"></p>
+      </div>
+    </section>
+    <article>
+      <h2>A tally that has to be learned</h2>
+      <p>The night shift at one glassworks marks annealing batches on clay, in a script used inside that shed. A notch in the top of the tablet is five. A pin in the lower field is one. That sum is the raw tally. A copper line across the middle means the tablet was turned on the fork, and the batch number is nine minus the raw tally. Specks along the sides are ash. They are not pins.</p>
+      <p>Nothing on the tablet is a decimal digit, and the prompt does not contain the number. The environment shows the picture, takes a reply, and returns a reward. That is the whole episode.</p>
+      <h3>Three questions</h3>
+      <p><b>Batch.</b> One step. Reply with the batch number, turn line included. An exact digit scores 1. A neighbor scores 0.2. Anything else scores 0.</p>
+      <p><b>Pins.</b> The same tablet, a different sentence. Reply with how many pins are in the lower field. Notches and the copper line do not count. The words are what change the answer.</p>
+      <p><b>Fork.</b> Two tablets. The lower batch leaves the kiln first. Reply left or right. This one is for a person. The trained policy reads a single tablet.</p>
+      <h3>What was trained</h3>
+      <p>The policy is a small vision-language model: a short convolution reads the tablet, and the prompt is summed in as characters. The reply is one token. Training is reinforcement learning. Each step scores every legal reply on that tablet and moves toward the ones the environment scored higher. The loss never sees the correct digit as a target sentence.</p>
+      <div class="stats" id="stats" hidden>
+        <div class="stat"><b id="batch-score">—</b><span>Batch number, after training, on 400 held-out tablets.</span></div>
+        <div class="stat"><b id="pins-score">—</b><span>Pin count on the same tablets. The prompt is the only change.</span></div>
+        <div class="stat"><b id="before-score">—</b><span id="before-caption">Before any update, on the same 400 tablets.</span></div>
+      </div>
+      <p id="follow"></p>
+      <h3>Run it</h3>
+      <pre>python -m cinder.play</pre>
+      <p>The OpenEnv server is the same loop for another program. <code>reset</code> returns the prompt and the picture. <code>step</code> takes the reply and returns the reward.</p>
+      <pre>pip install -e ".[openenv]"
+python -m cinder.server.app --port 8000</pre>
+    </article>
+  </main>
+  <script>
+    const prompt = document.getElementById("prompt");
+    const tablet = document.getElementById("tablet");
+    const text = document.getElementById("text");
+    const result = document.getElementById("result");
+    const trace = document.getElementById("trace");
+    const next = document.getElementById("next");
+    const model = document.getElementById("model");
+    let task = "batch";
+    let lines = [];
+
+    function remember(line) {
+      lines = [...lines, line].slice(-4);
+      trace.textContent = lines.join("\n");
+    }
+
+    async function reset() {
+      const response = await fetch("/api/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task }),
+      });
+      const body = await response.json();
+      tablet.src = "data:image/png;base64," + body.image;
+      prompt.textContent = body.prompt;
+      text.value = "";
+      text.disabled = false;
+      next.disabled = true;
+      result.className = "result";
+      result.textContent = "";
+      lines = [];
+      remember("reset()  " + body.task);
+      text.focus();
+    }
+
+    function showScore(body, reply) {
+      const reward = Number(body.reward);
+      const exact = reward === 1;
+      result.className = exact ? "result hit" : "result";
+      const shown = body.reading === undefined ? "" : "  The reading is " + body.reading + ".";
+      result.innerHTML = "Reward <b>" + reward.toFixed(1) + "</b>." + shown;
+      remember("step(" + reply + ")");
+      remember("reward " + reward.toFixed(1));
+      text.disabled = true;
+      next.disabled = false;
+    }
+
+    document.getElementById("guess").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const reply = text.value.trim();
+      if (!reply) return;
+      const response = await fetch("/api/step", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: reply }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        result.textContent = body.error || "That episode is finished.";
+        return;
+      }
+      showScore(body, reply);
+    });
+
+    model.addEventListener("click", async () => {
+      model.disabled = true;
+      const response = await fetch("/api/model", { method: "POST" });
+      const body = await response.json();
+      model.disabled = false;
+      if (!response.ok) {
+        result.textContent = body.error || "The policy is not available.";
+        return;
+      }
+      text.value = body.text;
+      showScore(body, body.text);
+    });
+
+    next.addEventListener("click", reset);
+    document.querySelectorAll("[data-task]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-task]").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        task = button.dataset.task;
+        model.disabled = task === "pair";
+        reset();
+      });
+    });
+
+    fetch("/api/metrics").then((response) => response.json()).then((metrics) => {
+      if (!metrics.after) return;
+      const stats = document.getElementById("stats");
+      stats.hidden = false;
+      const pct = (value) => Math.round(value * 1000) / 10 + "%";
+      document.getElementById("batch-score").textContent = pct(metrics.after.batch_exact);
+      document.getElementById("pins-score").textContent = pct(metrics.after.pins_exact);
+      document.getElementById("before-score").textContent = pct(metrics.before.batch_exact);
+      document.getElementById("before-caption").textContent =
+        "Batch accuracy before any update, on the same 400 tablets. Pins started at " + pct(metrics.before.pins_exact) + ".";
+      document.getElementById("follow").textContent =
+        "When the batch number and the pin count differ, the two prompts get different replies " +
+        pct(metrics.after.prompt_follows) + " of the time. Before training that was " +
+        pct(metrics.before.prompt_follows) + ".";
+    }).catch(() => {});
+
+    reset();
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "before": {
+    "n": 400,
+    "seed": 50000,
+    "batch_exact": 0.1075,
+    "pins_exact": 0.1025,
+    "batch_reward": 0.14200000000000018,
+    "pins_reward": 0.18500000000000064,
+    "prompt_follows": 0.1048951048951049
+  },
+  "after": {
+    "n": 400,
+    "seed": 50000,
+    "batch_exact": 0.885,
+    "pins_exact": 0.9525,
+    "batch_reward": 0.885,
+    "pins_reward": 0.9525,
+    "prompt_follows": 0.7727272727272727
+  },
+  "steps": 400,
+  "history_tail": [
+    0.1325,
+    0.27125,
+    0.13625,
+    0.25875,
+    0.135,
+    0.26,
+    0.135625,
+    0.26875,
+    0.135,
+    0.2625
+  ]
+}
