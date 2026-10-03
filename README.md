@@ -2,7 +2,7 @@
 
 A clay tablet from an annealing shed. The batch number is not written in digits. You reply, and the environment scores you.
 
-![A tablet with one notch and one pin](docs/tablet.png)
+![An episode playing: the tablet appears, a reply is entered, and the reward comes back](docs/episode.gif)
 
 The night shift at one glassworks marks batches in a tally used inside that shed and nowhere else.
 
