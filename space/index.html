@@ -243,7 +243,7 @@
       <pre>Read this annealing tablet.
 Reply with the batch number.</pre>
       <p><strong>Pins</strong> is the same tablet and a different sentence. Reply with how many pins are in the lower field. Notches and the copper line do not count. The picture can stay still while the words change the answer. That is why the prompt is part of the observation, not a caption glued to the image.</p>
-      <p><strong>Fork</strong> puts two tablets on the annealer’s fork. The lower batch leaves the kiln first. Reply left or right. A walk from one side to the other is not required. The score is 1 when the side is the lower batch, and 0 otherwise. That one is for a person. The policy was trained on a single tablet.</p>
+      <p><strong>Fork</strong> puts two tablets on the annealer’s fork. The lower batch leaves the kiln first. Reply left or right. The score is 1 when the side is the lower batch, and 0 otherwise. That one is for a person. The policy was trained on a single tablet.</p>
       <h3>Why the update is a reward</h3>
       <p>The policy is a small vision-language model. A short convolution reads the tablet. The prompt is summed in as characters. The reply is one token, a digit.</p>
       <p>Each training step lays out every legal reply for the same tablet. The environment scores them. The update raises the probability of a reply in proportion to the reward it just received. A group of identical scores would teach nothing, because nothing in the group is better. Here the scores differ: one digit is exact, a neighbor is close, and the rest are zero. The weights move toward the higher scores. They never receive the digit as a sentence to copy.</p>
